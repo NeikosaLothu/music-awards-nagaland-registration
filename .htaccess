@@ -1,0 +1,44 @@
+Options -Indexes
+RewriteEngine On
+
+# Force HTTPS — this handles real payment data, it must never run over plain HTTP.
+RewriteCond %{HTTPS} off
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Clean URLs for the private portal.
+RewriteRule ^login/?$ login.php [L,QSA]
+RewriteRule ^logout/?$ logout.php [L,QSA]
+RewriteRule ^dashboard/?$ dashboard/index.php [L,QSA]
+RewriteRule ^dashboard/submissions/?$ dashboard/submissions.php [L,QSA]
+RewriteRule ^dashboard/submission/?$ dashboard/submission.php [L,QSA]
+RewriteRule ^dashboard/categories/?$ dashboard/categories.php [L,QSA]
+RewriteRule ^dashboard/export/?$ dashboard/export.php [L,QSA]
+
+# Keep internal/config/database/backup/version-control files inaccessible
+# directly, wherever in the project they end up.
+<FilesMatch "(\.sql|\.sqlite|\.ini|\.env|\.log|\.bak|\.backup|\.swp|~|\.git.*|\.gitignore|composer\.(json|lock))$">
+    Require all denied
+</FilesMatch>
+
+# Dotfiles (.git, .env, .htaccess itself, etc.) and version-control folders.
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+RewriteRule ^\.git/ - [F,L]
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+    # Report-Only for now: this lets you check the browser console / the
+    # reporting endpoint for violations against the real, live app
+    # (Razorpay Checkout + Google reCAPTCHA in particular) before
+    # switching it to a real, enforced Content-Security-Policy header.
+    # Once you've confirmed nothing legitimate is blocked, rename this to
+    # "Content-Security-Policy" to start enforcing it.
+    Header always set Content-Security-Policy-Report-Only "default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; frame-ancestors 'self'; script-src 'self' 'unsafe-inline' https://checkout.razorpay.com https://www.google.com https://www.gstatic.com https://www.recaptcha.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://lumberjack.razorpay.com; frame-src https://api.razorpay.com https://checkout.razorpay.com https://www.google.com"
+</IfModule>

@@ -1,0 +1,13 @@
+# Real secrets - see config/secrets.local.example.php
+config/secrets.local.php
+
+# OS / editor clutter
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# Logs and local dumps
+*.log
+*.sql.bak
+*.zip
