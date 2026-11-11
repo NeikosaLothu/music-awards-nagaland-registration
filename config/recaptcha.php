@@ -22,5 +22,5 @@ require_once __DIR__ . '/env.php';
 |
 */
 
-define('RECAPTCHA_SITE_KEY', env_value('RECAPTCHA_SITE_KEY', '6LdiTrstAAAAAB2p_hCUeiNcNg75RApq85T5excT'));
+define('RECAPTCHA_SITE_KEY', env_value('RECAPTCHA_SITE_KEY', ''));
 define('RECAPTCHA_SECRET_KEY', env_value('RECAPTCHA_SECRET_KEY', ''));
